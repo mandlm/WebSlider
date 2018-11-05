@@ -1,1 +1,2 @@
 imgdir = "."
+refresh = 5

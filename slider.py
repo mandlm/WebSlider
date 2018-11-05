@@ -3,7 +3,7 @@
 from flask import Flask, render_template, send_from_directory, redirect, url_for
 from random import randint
 from os import listdir
-import random
+from random import choice
 
 import config
 
@@ -11,13 +11,13 @@ app = Flask(__name__)
 
 
 @app.route("/")
-def hello():
-    return render_template("hello.html", num=randint(1, 23))
+def random():
+    return render_template("random.html", refresh=config.refresh)
 
 
-@app.route("/random_image")
+@app.route("/random_image/")
 def random_image():
-    filename = random.choice(listdir(config.imgdir))
+    filename = choice(listdir(config.imgdir))
     return redirect(url_for("image", filename=filename))
 
 
