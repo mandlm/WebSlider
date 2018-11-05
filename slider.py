@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def random():
-    return render_template("random.html")
+    return render_template("random.html", refresh=config.refresh)
 
 
 @app.route("/random_image/")
