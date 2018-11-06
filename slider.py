@@ -2,8 +2,10 @@
 
 from flask import Flask, render_template, send_from_directory, redirect, url_for
 from random import randint
-from os import listdir
+from os import listdir, makedirs
 from random import choice
+from pathlib import Path
+from PIL import Image
 
 import config
 
@@ -23,7 +25,15 @@ def random_image():
 
 @app.route("/img/<path:filename>")
 def image(filename):
-    return send_from_directory(config.imgdir, filename)
+    scaled_img_dir = Path(config.imgdir) / ".slider" / "fhd"
+    if not scaled_img_dir.exists():
+        makedirs(scaled_img_dir)
+    if not (scaled_img_dir / filename).exists():
+        img = Image.open(Path(config.imgdir) / filename)
+        img.thumbnail((1920, 1080))
+        img.save(scaled_img_dir / filename)
+
+    return send_from_directory(scaled_img_dir, filename)
 
 
 if __name__ == "__main__":
