@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from flask import Flask, render_template, send_from_directory, redirect, url_for
-from random import randint
 from os import listdir, makedirs
 from random import choice
 from pathlib import Path
