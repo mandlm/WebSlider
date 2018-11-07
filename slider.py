@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from flask import Flask, render_template, send_from_directory, redirect, url_for
-from os import listdir, makedirs
 from random import choice
 from pathlib import Path
 from PIL import Image
@@ -18,15 +17,17 @@ def random():
 
 @app.route("/random_image/")
 def random_image():
-    filename = choice(listdir(config.imgdir))
-    return redirect(url_for("image", filename=filename))
+    imgdir = Path(config.imgdir)
+    images = list(imgdir.glob("*.jpg"))
+    selected_image = choice(images).relative_to(imgdir)
+    return redirect(url_for("image", filename=selected_image))
 
 
 @app.route("/img/<path:filename>")
 def image(filename):
     scaled_img_dir = Path(config.imgdir) / ".slider" / "fhd"
     if not scaled_img_dir.exists():
-        makedirs(scaled_img_dir)
+        scaled_img_dir.mkdir(parents=True)
     if not (scaled_img_dir / filename).exists():
         img = Image.open(Path(config.imgdir) / filename)
         img.thumbnail((1920, 1080))
