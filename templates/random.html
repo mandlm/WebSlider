@@ -9,15 +9,17 @@
 			background: url({{ url_for("static", filename="loading.gif") }}) 50% no-repeat;
 		}
 	</style>
-	<script>
-		var downloadingImage = new Image();
-		downloadingImage.onload = function(){
-			document.images[0].src = this.src;
-		};
-		downloadingImage.src = "{{ url_for("random_image") }}";
-	</script>
 	</head>
 	<body bgcolor="black">
-		<img src="{{ url_for("static", filename="clear.gif") }}" />
+		<img id="slider" src="{{ url_for("static", filename="clear.gif") }}" />
+		<script>
+			var downloadingImage = new Image();
+			downloadingImage.onload = function()
+			{
+				document.getElementById("slider").src = this.src;
+			};
+
+			downloadingImage.src = "{{ url_for("random_image") }}";
+		</script>
 	</body>
 </html>
