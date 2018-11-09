@@ -1,8 +1,23 @@
 <html>
 	<head>
-		<meta http-equiv="refresh" content="{{ refresh }};url={{ url_for("random") }}">
+		<meta http-equiv="refresh" content="{{ refresh }};url={{ url_for("random") }}" />
+	<style>
+		img {
+			width: 100%;
+			height: 98%;
+			object-fit: contain;
+			background: url({{ url_for("static", filename="loading.gif") }}) 50% no-repeat;
+		}
+	</style>
+	<script>
+		var downloadingImage = new Image();
+		downloadingImage.onload = function(){
+			document.images[0].src = this.src;
+		};
+		downloadingImage.src = "{{ url_for("random_image") }}";
+	</script>
 	</head>
 	<body bgcolor="black">
-		<img src="{{ url_for("random_image") }}" style="height: 98%; width: 100%; object-fit: contain"/>
+		<img src="{{ url_for("static", filename="clear.gif") }}" />
 	</body>
 </html>
