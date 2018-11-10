@@ -26,15 +26,18 @@ def random():
 
 @app.route("/random_image/")
 def random_image():
-    last_modified_time, last_modified_file = max(
-        (f.stat().st_mtime, f) for f in imgdir.glob(img_glob)
-    )
+    try:
+        last_modified_time, last_modified_file = max(
+            (f.stat().st_mtime, f) for f in imgdir.glob(img_glob)
+        )
 
-    if time() - last_modified_time <= 60:
-        selected_image = last_modified_file.relative_to(imgdir)
-    else:
-        images = list(imgdir.glob(img_glob))
-        selected_image = choice(images).relative_to(imgdir)
+        if time() - last_modified_time <= 60:
+            selected_image = last_modified_file.relative_to(imgdir)
+        else:
+            images = list(imgdir.glob(img_glob))
+            selected_image = choice(images).relative_to(imgdir)
+    except ValueError:
+        return redirect(url_for("static", filename="clear.gif"))
 
     return redirect(
         url_for("image", filename=selected_image)
