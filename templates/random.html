@@ -1,6 +1,5 @@
 <html>
 	<head>
-		<meta http-equiv="refresh" content="{{ refresh }};url={{ url_for("random") }}" />
 	<style>
 		img {
 			width: 100%;
@@ -19,7 +18,13 @@
 				document.getElementById("slider").src = this.src;
 			};
 
-			downloadingImage.src = "{{ url_for("random_image") }}";
+			function updateImage() 
+			{
+				downloadingImage.src = "{{ url_for("random_image") }}?" + new Date().getTime();
+			}
+
+			updateImage();
+			setInterval(updateImage, {{ refresh * 1000 }});
 		</script>
 	</body>
 </html>
