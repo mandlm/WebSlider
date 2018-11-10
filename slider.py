@@ -8,6 +8,7 @@ from time import time
 from hashlib import sha256
 import click
 from shutil import rmtree
+from tempfile import gettempdir
 
 import config
 
@@ -16,7 +17,11 @@ app = Flask(__name__)
 imgdir = Path(config.imgdir).expanduser().resolve()
 img_glob = "**/*.jpg" if config.recursive else "*.jpg"
 cache_resolution = config.resolution
-cache_dir = Path(config.cachedir) / ("%sx%s" % cache_resolution)
+cache_dir = (
+    Path(gettempdir()) / "webslider"
+    if config.cachedir == "auto"
+    else Path(config.cachedir)
+) / ("%sx%s" % cache_resolution)
 
 
 @app.route("/")
@@ -53,9 +58,9 @@ def image(filename):
 
 
 def rm_cachedir():
-    if Path(config.cachedir).exists():
-        print("Removing cache dir", config.cachedir)
-        rmtree(config.cachedir)
+    if cache_dir.exists():
+        print("Removing cache dir", cache_dir)
+        rmtree(cache_dir)
 
 
 def create_cachedir():
@@ -98,7 +103,7 @@ def run_slider(build_cache, clear_cache):
     if build_cache:
         pre_cache_images()
 
-    app.run()
+    app.run(host="0.0.0.0")
 
 
 if __name__ == "__main__":
