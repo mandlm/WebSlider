@@ -13,7 +13,8 @@ import config
 
 app = Flask(__name__)
 
-cache_resolution = (1920, 1080)
+imgdir = Path(config.imgdir).expanduser().resolve()
+cache_resolution = config.resolution
 cache_dir = Path(config.cachedir) / ("%sx%s" % cache_resolution)
 
 
@@ -25,7 +26,6 @@ def random():
 @app.route("/random_image/")
 def random_image():
     img_glob = "*jpg"
-    imgdir = Path(config.imgdir)
     last_modified_time, last_modified_file = max(
         (f.stat().st_mtime, f) for f in imgdir.glob(img_glob)
     )
@@ -64,7 +64,7 @@ def create_cache_file(filename):
 
     if not (cache_dir / cache_file).exists():
         print("Creating cache file", filename)
-        img = Image.open(Path(config.imgdir) / filename)
+        img = Image.open(imgdir / filename)
         img.thumbnail(cache_resolution)
         img.save(cache_dir / cache_file, "JPEG")
 
@@ -72,12 +72,11 @@ def create_cache_file(filename):
 
 
 def get_cache_filename(filename):
-    original_file_path = Path(config.imgdir) / filename
+    original_file_path = imgdir / filename
     return sha256(str(original_file_path.resolve()).encode("utf-8")).hexdigest()
 
 
 def pre_cache_images():
-    imgdir = Path(config.imgdir)
     for image_file in sorted(imgdir.glob("*.jpg")):
         create_cache_file(image_file.relative_to(imgdir))
 
