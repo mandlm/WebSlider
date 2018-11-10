@@ -1,3 +1,4 @@
 imgdir = "."
 refresh = 5
-cachedir = ".webslider"
+cachedir = "/tmp/webslider"
+resolution = (1920, 1080)
