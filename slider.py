@@ -36,7 +36,7 @@ def random_image():
         images = list(imgdir.glob(img_glob))
         selected_image = choice(images).relative_to(imgdir)
 
-    return redirect(url_for("image", filename=selected_image))
+    return redirect(url_for("image", filename=selected_image) + "?hash=%s" % get_cache_filename(selected_image))
 
 
 @app.route("/img/<path:filename>")
