@@ -5,6 +5,7 @@ from random import choice
 from pathlib import Path
 from PIL import Image
 from time import time
+from hashlib import sha256
 
 import config
 
@@ -39,14 +40,19 @@ def image(filename):
     cache_dir = Path(config.cachedir) / ("%sx%s" % cache_resolution)
 
     if not cache_dir.exists():
+        print("Creating cache dir", cache_dir)
         cache_dir.mkdir(parents=True)
 
-    if not (cache_dir / filename).exists():
-        img = Image.open(Path(config.imgdir) / filename)
-        img.thumbnail(cache_resolution)
-        img.save(cache_dir / filename)
+    original_file_path = Path(config.imgdir) / filename
+    cache_file = sha256(str(original_file_path.resolve()).encode("utf-8")).hexdigest()
 
-    return send_from_directory(cache_dir, filename)
+    if not (cache_dir / cache_file).exists():
+        print("Creating cache file", filename)
+        img = Image.open(original_file_path)
+        img.thumbnail(cache_resolution)
+        img.save(cache_dir / cache_file, "JPEG")
+
+    return send_from_directory(cache_dir, cache_file)
 
 
 if __name__ == "__main__":
