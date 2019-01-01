@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 
-from flask import Flask, render_template, send_from_directory, redirect, url_for
+from flask import (
+    Flask,
+    render_template,
+    send_from_directory,
+    redirect,
+    url_for,
+    request,
+)
 from random import choice
 from pathlib import Path
 from PIL import Image
@@ -15,7 +22,6 @@ import config
 app = Flask(__name__)
 
 imgdir = Path(config.imgdir).expanduser().resolve()
-img_glob = "**/*.jpg" if config.recursive else "*.jpg"
 cache_resolution = config.resolution
 cache_dir = (
     Path(gettempdir()) / "webslider"
@@ -24,22 +30,32 @@ cache_dir = (
 ) / ("%sx%s" % cache_resolution)
 
 
+def find_images():
+    images = set()
+    for filetype in config.filetypes:
+        glob = "**/" + filetype if config.recursive else filetype
+        images.update(imgdir.glob(glob))
+    return list(images)
+
+
 @app.route("/")
 def random():
+    print(request.remote_addr, request.base_url)
     return render_template("random.html", refresh=config.refresh)
 
 
 @app.route("/random_image/")
 def random_image():
+    print(request.remote_addr, request.base_url)
     try:
         last_modified_time, last_modified_file = max(
-            (f.stat().st_mtime, f) for f in imgdir.glob(img_glob)
+            (f.stat().st_mtime, f) for f in find_images()
         )
 
         if time() - last_modified_time <= 60:
             selected_image = last_modified_file.relative_to(imgdir)
         else:
-            images = list(imgdir.glob(img_glob))
+            images = find_images()
             selected_image = choice(images).relative_to(imgdir)
     except ValueError:
         return redirect(url_for("static", filename="clear.gif"))
@@ -52,6 +68,7 @@ def random_image():
 
 @app.route("/img/<path:filename>")
 def image(filename):
+    print(request.remote_addr, request.base_url)
     cache_filename = create_cache_file(filename)
 
     return send_from_directory(cache_dir, cache_filename)
@@ -88,7 +105,7 @@ def get_cache_filename(filename):
 
 
 def pre_cache_images():
-    for image_file in sorted(imgdir.glob(img_glob)):
+    for image_file in sorted(find_images()):
         create_cache_file(image_file.relative_to(imgdir))
 
 
