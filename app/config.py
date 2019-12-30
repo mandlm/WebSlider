@@ -1,4 +1,4 @@
-imgdir = "."
+imgdir = "/images"
 recursive = True
 refresh = 5
 cachedir = "auto"

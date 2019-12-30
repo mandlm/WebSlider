@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+    webslider:
+        container_name: webslider
+        build: 
+            context: .
+        ports:
+            - 5005:5000
+        volumes:
+            - ./images:/images
+        restart: always
+
